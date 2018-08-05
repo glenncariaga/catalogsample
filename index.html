@@ -1,0 +1,322 @@
+<!doctype html>
+
+<head>
+  <style>
+    .wrap {
+      overflow: hidden;
+    }
+
+    .leftButton {
+      align-self: flex-start;
+      order: -1;
+    }
+
+    .descOverlay {
+      position: absolute;
+      background: white;
+      opacity: .67;
+      height: 10%;
+    }
+
+    .desc {
+      padding: 2%;
+      display: flex;
+      align-content: center;
+      width: 100%;
+      top: 0px;
+    }
+
+    .price {
+      top: 45%;
+      padding: 5px 10px 5px;
+      position: absolute;
+      background: white;
+      opacity: .67;
+      align-self: center;
+    }
+
+
+    .rightButton {
+      transform: rotate(180deg);
+      align-self: flex-end;
+      order: 1;
+    }
+
+    .buttonStyle {
+      align-self: center;
+    }
+
+    .carouselLeft {
+      position: absolute;
+      top: 45%;
+      left: 2%;
+      font-size: 100%;
+      height: 25px;
+      width: 25px;
+      border-radius: 50%;
+      background: white;
+      opacity: .67;
+    }
+
+    .carouselRight {
+      position: absolute;
+      top: 45%;
+      right: 2%;
+      font-size: 100%;
+      height: 25px;
+      width: 25px;
+      border-radius: 50%;
+      background: white;
+      opacity: .67;
+    }
+
+    .menu {
+      align-items: center;
+      flex: 1;
+      align-self: stretch;
+      width: 100%;
+      order: 0;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      margin: 0;
+      padding: 0;
+    }
+
+    .menuContainer {
+      width: 100vw;
+      align-self: stretch;
+      overflow: hidden;
+      flex-wrap: nowrap;
+      display: flex;
+      flex-direction: row;
+      margin: 0;
+      padding: 2px;
+    }
+
+    .menuCard {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      list-style: none;
+      width: 100%;
+      padding: 0%;
+    }
+
+    .modal {
+      display: none;
+      /* Hidden by default */
+      position: fixed;
+      /* Stay in place */
+      z-index: 1;
+      /* Sit on top */
+      padding-top: 100px;
+      /* Location of the box */
+      left: 0;
+      top: 0;
+      width: 100%;
+      /* Full width */
+      height: 100%;
+      /* Full height */
+      overflow: auto;
+      /* Enable scroll if needed */
+      background-color: rgb(0, 0, 0);
+      /* Fallback color */
+      background-color: rgba(0, 0, 0, 0.4);
+      /* Black w/ opacity */
+    }
+
+    /* Modal Content */
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 30%;
+      border: 1px solid #888;
+      display: block;
+      float: left;
+      padding: 2px;
+    }
+
+    .carouselUIContainer {
+      align-self: center;
+      align-content: center;
+      position: absolute;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-evenly;
+      background: white;
+      opacity: .67;
+      height: 2%;
+      width: 90%;
+      bottom: 2%;
+      padding: 8px;
+    }
+
+    .image-container {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .selectorActive {
+      background-color: #888;
+      border-radius: 50%;
+      height: 15px;
+      width: 15px;
+      display: inline-block
+    }
+
+    .selector {
+      background-color: yellowgreen;
+      border-radius: 50%;
+      height: 15px;
+      width: 15px;
+      display: inline-block
+    }
+  </style>
+</head>
+
+<body>
+  <div class='menuContainer'>
+    <div onClick='slideMenu(true)' class='leftButton buttonStyle'>
+      <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDvNM38Kr2ngjhe8dwxj-iVAzxfu1Uwu5wmxm0VI9Pp09ITM71jg'>
+    </div>
+    <ul id='menu' class='menu wrap'></ul>
+    <div onClick='slideMenu(false)' class='rightButton buttonStyle'>
+      <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQDvNM38Kr2ngjhe8dwxj-iVAzxfu1Uwu5wmxm0VI9Pp09ITM71jg'>
+    </div>
+  </div>
+
+
+  <!-- The Modal -->
+  <div id="carouselModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <div id='image-container' class='image-container'></div>
+    </div>
+
+  </div>
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      let catalog = {}
+      catalog = await consumeAPI(); //once the page is loaded, the data needs to be loaded.
+      loadMenu(catalog.groups);
+      //add event listeners
+
+    })
+    const slideMenu = (dir) => {
+      let menuCards = document.getElementsByClassName('menuCard')
+      let newOrder = []
+      for (let i = 0; i < menuCards.length; i++) {
+        newOrder.push(menuCards[i].outerHTML)
+      }
+      if (dir) {
+        let reOrder = newOrder.splice(0, 1)
+        newOrder.push(reOrder)
+      } else {
+        let reOrder = newOrder.splice(newOrder.length - 1, 1)
+        newOrder.unshift(reOrder)
+      }
+      document.getElementById('menu').innerHTML = newOrder.join('')
+    }
+    const loadMenu = async (catalog) => {
+      let cards = []
+      cards = catalog.map(item => {
+        values = {
+          hero: item.hero.href,
+          name: item.name,
+          price: item.priceRange.selling.high,
+          images: item.images
+        }
+        return menuCard(values)
+      })
+      document.getElementById('menu').innerHTML = cards.join('')
+    }
+
+    const consumeAPI = async () => {
+      let uri = 'https://www.westelm.com/services/catalog/v4/category/shop/new/all-new/index.json'
+      try {
+        let response = await fetch(uri);
+        //some logic here can be changed to allow for pagination, so we don't have to load all the objects all at once.
+        response = await response.json();
+        return response
+      }
+      catch (error) {
+        return error
+      }
+    }
+
+    const menuCard = (values) => {
+      return `
+        <div onClick = 'getItem(${JSON.stringify(values.images)})'
+        class = 'menuCard'>
+        <img  src = '${values.hero}'>
+        <div class = 'price'>$${values.price}</div>
+        <div class = 'desc descOverlay'>${values.name}</div>
+        </div>
+      `
+    }
+
+    const getItem = images => {
+      let modal = document.getElementById('carouselModal')
+      let span = document.getElementsByClassName("close")[0]
+      let active = 0
+      let image = images[active].href
+
+      span.onclick = () => modal.style.display = 'none'
+      window.onclick = () => {
+        event.target == modal ? modal.style.display = 'none' : null
+      }
+      modal.style.display = 'block'
+      document.getElementById('image-container').innerHTML = imgCarousel(image) + carouselUI(images, active)
+    }
+
+    const carouselUI = (images, active) => {
+      let btns = images.map((elem, index) => {
+        if (index === active) {
+          return `<span class ='selectorActive' onClick = 'changeCarouselImage(${JSON.stringify(images)}, ${index})'></span>`
+        } else {
+          return `<span class ='selector' onClick = 'changeCarouselImage(${JSON.stringify(images)}, ${index})'></span>`
+        }
+
+      })
+      return `<div class = 'carouselUIContainer'>${btns.join('')}</div>
+      <span class = 'carouselLeft' onClick = 'rotateCarousel(true,${active},${JSON.stringify(images)})'>L</span>
+      <span class = 'carouselRight' onClick = 'rotateCarousel(false,${active},${JSON.stringify(images)})'>R</span>`
+    }
+
+    const rotateCarousel = (dir, active, images) => {
+      if (dir) {
+        active = active === 0 ? images.length - 1 : active - 1;
+        changeCarouselImage(images, active)
+      } else {
+        active = active === images.length - 1 ? 0 : active + 1;
+        changeCarouselImage(images, active)
+      }
+    }
+
+    const changeCarouselImage = (images, active) => {
+      image = images[active].href
+      document.getElementById('image-container').innerHTML = imgCarousel(image) + carouselUI(images, active)
+    }
+
+    const imgCarousel = (images) => {
+      return `
+        <img src = ${images}>
+      `
+    }
+
+    const imgButtons = img => {
+      return `
+        <li class = 'imgButtons' onClick = 'changeImage(${img})></li>
+      `
+      changeImage = (img) => {
+        this.getElementsByClassName('')
+      }
+    }
+  </script>
+</body>
+
+</html>
