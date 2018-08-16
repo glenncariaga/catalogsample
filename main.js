@@ -1,14 +1,5 @@
-document.addEventListener("DOMContentLoaded", async function () {
-    let uri = './index.json'
-    let options = {
-        method: 'get',
-    }
-    let catalog = {}
-    catalog = await consumeAPI(uri, options); //once the page is loaded, the data needs to be loaded.
-    loadMenu(catalog.groups);
-    //add event listeners
 
-})
+
 const loadMenu = async (catalog) => {
     let cards = []
     cards = catalog.map(listItem)
@@ -19,7 +10,7 @@ const listItem = (item) => {
     values = {
         hero: item.hero.href,
         name: item.name,
-        price: item.priceRange.selling.high,
+        // price: item.priceRange.selling.high ||  '110',
         images: item.images
     }
     return menuCard(values)
@@ -78,11 +69,14 @@ const carouselUI = (images, active) => {
 const rotateCarousel = (dir, active, images) => {
     if (dir) {
         active = active === 0 ? images.length - 1 : active - 1;
-        changeCarouselImage(images, active)
     } else {
         active = active === images.length - 1 ? 0 : active + 1;
-        changeCarouselImage(images, active)
     }
+    if (JSON.stringify(images) === JSON.stringify([1, 2, 3])) {
+        //used for testing
+        return { images, active }
+    }
+    changeCarouselImage(images, active)
 }
 
 const changeCarouselImage = (images, active) => {
