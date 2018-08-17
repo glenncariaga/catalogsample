@@ -10,9 +10,10 @@ const listItem = (item) => {
     values = {
         hero: item.hero.href,
         name: item.name,
-        // price: item.priceRange.selling.high ||  '110',
+        price: item.priceRange.selling.high,
         images: item.images
     }
+
     return menuCard(values)
 }
 
@@ -29,14 +30,7 @@ const consumeAPI = async (uri, options) => {
 }
 
 const menuCard = (values) => {
-    return `
-      <div onClick = 'getItem(${JSON.stringify(values.images)})'
-      class = 'menuCard'>
-      <img  src = '${values.hero}'>
-      <div class = 'price'>$${values.price}</div>
-      <div class = 'desc descOverlay'>${values.name}</div>
-      </div>
-    `
+    return `<div onClick = 'getItem(${JSON.stringify(values.images)})'class = 'menuCard'><img  src = '${values.hero}'><div class = 'price'>$${values.price}</div><div class = 'desc descOverlay'>${values.name}</div></div>`
 }
 
 const getItem = images => {

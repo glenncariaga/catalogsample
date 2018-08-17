@@ -1,0 +1,28 @@
+{
+  "name": "williamsonoma",
+  "version": "1.0.0",
+  "description": "catalog sample",
+  "main": "main.js",
+  "dependencies": {
+    "webpack-dev-server": "^3.1.5"
+  },
+  "devDependencies": {
+    "babel-loader": "^7.1.5",
+    "webpack": "^4.16.5",
+    "webpack-cli": "^3.1.0"
+  },
+  "scripts": {
+    "build": "webpack-dev-server --entry ./src/js/main.js --output-filename ./dist/bundle.js",
+    "test": "node ./src/js/test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glenncariaga/catalogsample.git"
+  },
+  "author": "Glenn Cariaga",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/glenncariaga/catalogsample/issues"
+  },
+  "homepage": "https://github.com/glenncariaga/catalogsample#readme"
+}

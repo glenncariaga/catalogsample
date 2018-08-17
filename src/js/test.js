@@ -1,4 +1,3 @@
-
 const runTests = async () => {
     console.log(listItemTest());
     console.log(await consumeAPITest())
@@ -6,23 +5,24 @@ const runTests = async () => {
     console.log(rotateCarouselTest())
 }
 
-
 const listItemTest = () => {
+    let msg = 'listItem failed'
     let item = {
-        hero: 'test html',
+        hero: { href: 'test html' },
         name: 'test name',
-        // price: '123',
+        priceRange: { selling: { high: '123' } },
         images: ['a', 'b', 'c']
     }
-    answer = `
-    <div onClick = 'getItem(['a', 'b', 'c'])'
-    class = 'menuCard'>
-    <img  src = 'test hml'>
-    <div class = 'price'>$123</div>
-    <div class = 'desc descOverlay'>test name</div>
-    </div>`
-    result = listItem(item);
-    let msg = result === answer ? 'listItemTest passed' : 'listItem unexpected return'
+    answer = `<div onClick = 'getItem(["a","b","c"])'class = 'menuCard'><img  src = 'test html'><div class = 'price'>$123</div><div class = 'desc descOverlay'>test name</div></div>`
+    result = JSON.stringify(listItem(item));
+    answer = JSON.stringify(answer)
+
+    if (result === answer) {
+        msg = 'listItem passed'
+    } else {
+        msg = 'listItem unexpected returns'
+    }
+
     if (!result) {
         msg = 'listItem cannot be empty'
     }
